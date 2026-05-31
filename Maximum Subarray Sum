@@ -1,0 +1,56 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'maximumSum' function below.
+#
+# The function is expected to return a LONG_INTEGER.
+# The function accepts following parameters:
+#  1. LONG_INTEGER_ARRAY a
+#  2. LONG_INTEGER m
+#
+
+def maximumSum(a, m):
+    import bisect
+    
+    max_sum = 0
+    prefix_mod = 0
+    sorted_prefixes = []
+    
+    for num in a:
+        prefix_mod = (prefix_mod + num) % m
+        max_sum = max(max_sum, prefix_mod)
+        
+        # find smallest prefix_mod value greater than current prefix_mod
+        idx = bisect.bisect_right(sorted_prefixes, prefix_mod)
+        if idx < len(sorted_prefixes):
+            max_sum = max(max_sum, prefix_mod - sorted_prefixes[idx] + m)
+        
+        # insert while maintaining sorted order
+        bisect.insort(sorted_prefixes, prefix_mod)
+    
+    return max_sum
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    q = int(input().strip())
+
+    for q_itr in range(q):
+        first_multiple_input = input().rstrip().split()
+
+        n = int(first_multiple_input[0])
+
+        m = int(first_multiple_input[1])
+
+        a = list(map(int, input().rstrip().split()))
+
+        result = maximumSum(a, m)
+
+        fptr.write(str(result) + '\n')
+
+    fptr.close()
