@@ -1,0 +1,73 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'activityNotifications' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER_ARRAY expenditure
+#  2. INTEGER d
+#
+
+def activityNotifications(expenditure, d):
+    from collections import defaultdict
+    
+    count = 0
+    # frequency array (expenditure values 0-200)
+    freq = [0] * 201
+    
+    # build initial frequency array for first window
+    for i in range(d):
+        freq[expenditure[i]] += 1
+    
+    def getMedian(freq, d):
+        count = 0
+        median1 = median2 = 0
+        
+        for i in range(201):
+            count += freq[i]
+            if d % 2 == 1:          # odd: one middle element
+                if count >= (d + 1) // 2:
+                    return i
+            else:                    # even: average of two middle elements
+                if median1 == 0 and count >= d // 2:
+                    median1 = i
+                if count >= d // 2 + 1:
+                    median2 = i
+                    return (median1 + median2) / 2
+        return 0
+    
+    # slide the window
+    for i in range(d, len(expenditure)):
+        median = getMedian(freq, d)
+        
+        if expenditure[i] >= 2 * median:
+            count += 1
+        
+        # slide window: remove oldest, add newest
+        freq[expenditure[i - d]] -= 1
+        freq[expenditure[i]] += 1
+    
+    return count
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    first_multiple_input = input().rstrip().split()
+
+    n = int(first_multiple_input[0])
+
+    d = int(first_multiple_input[1])
+
+    expenditure = list(map(int, input().rstrip().split()))
+
+    result = activityNotifications(expenditure, d)
+
+    fptr.write(str(result) + '\n')
+
+    fptr.close()
